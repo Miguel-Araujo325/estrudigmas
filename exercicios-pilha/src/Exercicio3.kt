@@ -2,20 +2,20 @@ import java.util.*
 
 fun main() {
     var frase = "O rato roeu a roupa do rei de Roma"
+    println(frase)
     inverterFrase(frase)
 }
 
 fun inverterFrase(frase: String) {
     var pilha = Stack<Char>()
-    for (indice in frase.indices) {
-        pilha.push(frase[indice])
+
+    for (i in frase.indices) {
+        pilha.push(frase[i])
     }
 
     while (!pilha.isEmpty()) {
         print(pilha.pop())
     }
-
-    println()
 }
 
 /*
