@@ -4,19 +4,23 @@ import java.util.*
 import java.util.concurrent.ArrayBlockingQueue
 
 class Repositorio(
-    val lista: MutableList<Musica>,
-    val pilha: Stack<Musica>,
+    val lista: MutableList<Musica> = mutableListOf(),
+    val pilha: Stack<Int> = Stack(),
     val fila: ArrayBlockingQueue<Musica> = ArrayBlockingQueue<Musica>(10)
 ) {
+    private var id: Int = 100
+
     fun salvar(musica: Musica) {
-        pilha.add(musica);
-        agendarSalvar(musica)
+        lista.add(musica)
+        pilha.push(musica.id)
+        println("Música ${musica.nome} salva com sucesso!")
     }
 
     fun deletar(id: Int) {
         val musica = lista.find { it.id == id }
         if (musica != null) {
             lista.remove(musica)
+            println("Música com id $id deletada.")
         } else {
             println("ID inexistente")
         }
@@ -24,20 +28,22 @@ class Repositorio(
 
     fun exibir() {
         if (lista.isNotEmpty()) {
-            for (musica in lista) {
-                println(musica.toString())
-            }
+            println("Lista de músicas:")
+            lista.forEach { println(it) }
         } else {
             println("Repositório vazio")
         }
-        println(if (fila.isNotEmpty()) "Último elemento da fila ${fila.peek().toString()}" else "A fila está vazia")
-        println(if (pilha.isNotEmpty()) "Último elemento da pilha ${pilha.peek().toString()}" else "A pilha está vazia")
+
+        println(if (pilha.isNotEmpty()) "Pilha de IDs: $pilha" else "A pilha está vazia")
+        println(if (fila.isNotEmpty()) "Fila de agendamentos: ${fila.toList()}" else "A fila está vazia")
         println()
     }
 
     fun desfazer() {
         if (pilha.isNotEmpty()) {
-            deletar(pilha.pop().id)
+            val id = pilha.pop()
+            deletar(id)
+            println("Operação de salvar desfeita.")
         } else {
             println("Não há nada a desfazer")
         }
@@ -52,14 +58,26 @@ class Repositorio(
     }
 
     fun executarAgendado(qtdOperacoes: Int) {
-        if (fila.isNotEmpty() && qtdOperacoes > 0 && qtdOperacoes < fila.size + 1) {
-            for (i in 0..<qtdOperacoes) {
-                lista.add(fila.poll())
+        if (fila.isNotEmpty()) {
+            if (qtdOperacoes <= 0 || qtdOperacoes > fila.size) {
+                println("Quantidade inválida")
+            } else {
+                for (i in 0 until qtdOperacoes) {
+                    val musica = fila.poll()
+                    if (musica != null) {
+                        salvar(musica)
+                    }
+                }
             }
         } else {
             println("Não há operações agendadas")
         }
     }
+
+    fun gerarNovoId(): Int {
+        return id++
+    }
+}
 }
 /*
 1- Dessa forma, crie uma classe chamada Repositorio.

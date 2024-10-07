@@ -4,10 +4,10 @@ import java.util.*
 import java.util.concurrent.ArrayBlockingQueue
 
 fun main() {
-    val repositorio =
-        Repositorio(lista = mutableListOf(), pilha = Stack<Musica>(), fila = ArrayBlockingQueue<Musica>(10));
-    var opcao = 0;
-    while (opcao != 7) {
+    val repositorio = Repositorio()
+    var opcao: Int
+
+    do {
         println("1- Salvar objeto")
         println("2- Deletar objeto")
         println("3- Exibir")
@@ -15,7 +15,8 @@ fun main() {
         println("5- Agendar salvar")
         println("6- Executar agendado")
         println("7- Fim")
-        opcao = readLine()!!.toInt();
+        opcao = readLine()!!.toInt()
+
         when (opcao) {
             1 -> {
                 println("Digite o nome da música")
@@ -24,28 +25,17 @@ fun main() {
                 val autor = readLine()!!
                 println("Digite a duração da música")
                 val duracao = readLine()!!.toDouble()
-                val musica = if (repositorio.pilha.isNotEmpty()) {
-                    Musica(repositorio.pilha.lastElement().id + 1, nome, autor, duracao)
-                } else {
-                    Musica(100, nome, autor, duracao)
-                }
+                val id = repositorio.gerarNovoId()
+                val musica = Musica(id, nome, autor, duracao)
                 repositorio.salvar(musica)
             }
-
             2 -> {
                 println("Digite o id da música a ser deletada")
                 val id = readLine()!!.toInt()
                 repositorio.deletar(id)
             }
-
-            3 -> {
-                repositorio.exibir()
-            }
-
-            4 -> {
-                repositorio.desfazer()
-            }
-
+            3 -> repositorio.exibir()
+            4 -> repositorio.desfazer()
             5 -> {
                 println("Digite o nome da música")
                 val nome = readLine()!!
@@ -53,25 +43,19 @@ fun main() {
                 val autor = readLine()!!
                 println("Digite a duração da música")
                 val duracao = readLine()!!.toDouble()
-                val musica = Musica(100 + repositorio.lista.size, nome, autor, duracao)
-                repositorio.salvar(musica)
+                val id = repositorio.gerarNovoId()
+                val musica = Musica(id, nome, autor, duracao)
+                repositorio.agendarSalvar(musica)
             }
-
             6 -> {
                 println("Digite a quantidade de operações agendadas a serem executadas")
                 val qtdOperacoes = readLine()!!.toInt()
                 repositorio.executarAgendado(qtdOperacoes)
             }
-
-            7 -> {
-                println("Fim")
-            }
-
-            else -> {
-                println("Opção inválida")
-            }
+            7 -> println("Fim")
+            else -> println("Opção inválida")
         }
-    }
+    } while (opcao != 7)
 }
 /*
 2- Arquivo Main, no método main:
