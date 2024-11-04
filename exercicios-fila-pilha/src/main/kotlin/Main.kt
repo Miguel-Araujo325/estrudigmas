@@ -46,7 +46,7 @@ v = {2,7,-3,-50,45,-4,30,-21,38}
 O método deverá exibir a sequência: 2 7 45 30 38 -3 -50 -4 -21
  */
 
-fun separaPositivoNegativoOrdemDiferente(v: Array<Int>) {
+fun separaPositivoNegativoOrdemDiferente(v: Array<Int>) {3
     var positivos = ArrayBlockingQueue<Int>(v.size)
     var negativos = Stack<Int>()
 
