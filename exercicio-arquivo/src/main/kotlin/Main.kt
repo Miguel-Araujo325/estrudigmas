@@ -7,8 +7,9 @@ import java.time.format.DateTimeFormatter
 import java.util.Formatter
 import java.util.Scanner
 
+val musicas = mutableListOf<Musica>()
+
 fun main() {
-    val musicas = mutableListOf<Musica>()
     musicas.addAll(
         listOf(
             Musica(1, "Nonsense", "Sabrina Carpenter", 2.53, 2022, "Pop", "Emails I Can't Send", "Island Records"),
@@ -51,33 +52,10 @@ fun main() {
             }
 
             2 -> {
-                println(
-                    String.format(
-                        "%5S | %-20S | %-15S | %8S | %12S | %-10S | %-15S | %-15S",
-                        "ID",
-                        "Nome",
-                        "Autor",
-                        "Duração",
-                        "Ano Lançamento",
-                        "Gênero",
-                        "Álbum",
-                        "Gravadora"
-                    )
-                )
-                for (musica in musicas) {
-                    println(
-                        String.format(
-                            "%5d | %-20.20s | %-15.15s | %8.2f | %12d | %-10.10s | %-15.15s | %-15.15s",
-                            musica.id,
-                            musica.nome,
-                            musica.autor,
-                            musica.duracao,
-                            musica.anoLancamento,
-                            musica.genero,
-                            musica.album,
-                            musica.gravadora
-                        )
-                    )
+                if (musicas.isEmpty()) {
+                    println("Lista vazia")
+                } else {
+                    imprimirMusicas()
                 }
             }
 
@@ -96,13 +74,14 @@ fun main() {
             5 -> {
                 print("Digite o nome do arquivo: ")
                 val nomeArquivo = readLine()!!
-                val musicasLidas = lerCsv(nomeArquivo)
-                musicas.clear()
-                musicas.addAll(musicasLidas)
+                lerCsv(nomeArquivo)
+                imprimirMusicas()
             }
 
             6 -> {
-                // TO DO
+                print("Digite o nome do arquivo: ")
+                val nomeArquivo = readLine()!!
+                letTxt(nomeArquivo)
             }
 
             7 -> println("Fim")
@@ -111,14 +90,54 @@ fun main() {
     }
 }
 
+fun imprimirMusicas() {
+    // Cabeçalho
+    println(
+        String.format(
+            "%5S | %-20S | %-15S | %8S | %12S | %-10S | %-15S | %-15S",
+            "ID",
+            "NOME",
+            "AUTOR",
+            "Duração",
+            "Ano Lançamento",
+            "Gênero",
+            "Álbum",
+            "Gravadora"
+        )
+    )
+    // Imprime as músicas
+    for (musica in musicas) {
+        println(
+            String.format(
+                "%5d | %-20.20s | %-15.15s | %8.2f | %14d | %-10.10s | %-15.15s | %-15.15s",
+                musica.id,
+                musica.nome,
+                musica.autor,
+                musica.duracao,
+                musica.anoLancamento,
+                musica.genero,
+                musica.album,
+                musica.gravadora
+            )
+        )
+    }
+}
+
+// CSV -> Comma Separated Values
 fun gravarCsv(musicas: List<Musica>, nomeArquivo: String) {
     if (musicas.isEmpty()) {
-        println("Não há nada a gravar")
+        println("Lista vazia")
         return
     }
+
+    //Inicializa as variáveis de arquivo e saída
+
+    // FileWriter é uma classe que permite escrever em um arquivo de texto
     val arquivo = FileWriter(nomeArquivo)
+    // Formatter é uma classe que permite escrever em um arquivo de texto formatando os dados
     val saida = Formatter(arquivo)
-    saida.format("id;nome;autor;duracao;anoLancamento;genero;album;gravadora\n")
+
+    // Escreve o conteúdo da lista no arquivo, os separando por ";"
     for (musica in musicas) {
         saida.format(
             "%d;%s;%s;%.2f;%d;%s;%s;%s\n",
@@ -132,24 +151,29 @@ fun gravarCsv(musicas: List<Musica>, nomeArquivo: String) {
             musica.gravadora
         )
     }
-    saida.close()
+
+    // Fecha o arquivo
     arquivo.close()
+    // Fecha o Formatter
+    saida.close()
 }
 
-fun lerCsv(nomeArquivo: String): List<Musica> {
+fun lerCsv(nomeArquivo: String) {
+    if (nomeArquivo.equals("")) {
+        println("Nome do arquivo inválido")
+        return
+    } else if (!nomeArquivo.endsWith(".csv")) {
+        println("Arquivo inválido")
+        return
+    }
+
+    //Inicializa as variáveis de arquivo e leitor
+    // FileReader é uma classe que permite ler um arquivo de texto
     val arquivo = FileReader(nomeArquivo)
+    // Scanner é uma classe que permite ler um arquivo de texto
     val leitor = Scanner(arquivo).useDelimiter("[;\\n]")
-    val musicas = mutableListOf<Musica>()
-    leitor.nextLine()
 
-    println(
-        String.format(
-            "%-5s | %-20s | %-15s | %-8s | %-12s | %-10s | %-15s | %-15s",
-            "ID", "Nome", "Autor", "Duração", "Ano Lançamento", "Gênero", "Álbum", "Gravadora"
-        )
-    )
-    println("-".repeat(120))
-
+    //While para percrrer o arquivo
     while (leitor.hasNext()) {
         val id = leitor.nextInt()
         val nome = leitor.next()
@@ -159,25 +183,26 @@ fun lerCsv(nomeArquivo: String): List<Musica> {
         val genero = leitor.next()
         val album = leitor.next()
         val gravadora = leitor.next()
-        println(
-            String.format(
-                "%-5d | %-20.20s | %-15.15s | %8.2f | %14d | %-10.10s | %-15.15s | %-15.15s",
-                id, nome, autor, duracao, anoLancamento, genero, album, gravadora
-            )
-        )
+        musicas.add(Musica(id, nome, autor, duracao, anoLancamento, genero, album, gravadora))
     }
+
+    //Fecha o leitor
     leitor.close()
+    //Fecha o arquivo
     arquivo.close()
-    return musicas
 }
 
+// TXT -> Text
 fun gravarTxt(musicas: List<Musica>, nomeArquivo: String) {
     if (musicas.isEmpty()) {
-        println("Lista vazia. Não há nada a gravar!")
+        println("Lista vazia")
         return
     }
 
+    // Inicializando variáveis de arquivo e saída
+    // FileWriter é uma classe que permite escrever em um arquivo de texto
     val arquivo = FileWriter(nomeArquivo)
+    // Formatter é uma classe que permite escrever em um arquivo de texto formatando os dados
     val saida = Formatter(arquivo)
 
     // Escrevendo header do arquivo
@@ -189,10 +214,10 @@ fun gravarTxt(musicas: List<Musica>, nomeArquivo: String) {
         )
     header += "01"
 
+    // Escrevendo header no arquivo
     saida.format(header + "\n")
 
     // Escrevendo corpo do arquivo
-
     for (musica in musicas) {
         val linha = StringBuilder()
         linha.append("02")
@@ -205,25 +230,82 @@ fun gravarTxt(musicas: List<Musica>, nomeArquivo: String) {
         linha.append(String.format("%-40.40s", musica.album))
         linha.append(String.format("%-30.30s", musica.gravadora))
 
-        // Adiciona a linha formatada no arquivo de saída
+        // Escrevendo linha no arquivo
         saida.format(linha.toString() + "\n")
     }
 
-    // Gravando registro do trailer
+    // Trailer
     var trailer = "01"
-    trailer += String.format("%010d", musicas.size)
+    trailer += String.format("%05d", musicas.size)
 
+    //Escrevendo trailer no arquivo
     saida.format(trailer + "\n")
 
+    // Fechar arquivo
     saida.close()
     arquivo.close()
 }
 
-/*
-Gravar arquivo TXT
-Se a lista estiver vazia, exiba mensagem de "Lista vazia. Não há nada a gravar!"
-Se a lista não estiver vazia, gravar o arquivo e ao final exiba "Gravação efetuada com sucesso!"
+fun letTxt(nomeArquivo: String) {
+    if (nomeArquivo.equals("")) {
+        println("Nome do arquivo inválido")
+        return
+    } else if (!nomeArquivo.endsWith(".txt")) {
+        println("Arquivo inválido")
+        return
+    }
 
-Para gravação do arquivo txt, utilize o documento de layout criado no exercício EDP-27
-Lembrando que o documento de layout precisa estar de acordo com os atributos definidos em sua classe de tema livre.
- */
+    // Inicializando variáveis de arquivo e leitor
+    // FileReader é uma classe que permite ler um arquivo de texto
+    val arquivo = FileReader(nomeArquivo)
+    // Scanner é uma classe que permite ler um arquivo de texto
+    val leitor = Scanner(arquivo)
+
+    while (leitor.hasNext()) {
+        val linha = leitor.nextLine()
+        val registro = linha.substring(0, 2)
+        when(registro){
+            // Header
+            "00" -> {
+                val conteudo = linha.substring(2, 9)
+                val dataHora = linha.substring(9, 28)
+                val versao = linha.substring(28, 30)
+
+                println("Conteúdo do arquivo: $conteudo")
+                println("Data/Hora: $dataHora")
+                println("Versão: $versao")
+            }
+
+            // Conteudo
+            "02" -> {
+                val id = linha.substring(2, 6).trim().toInt()
+                val nome = linha.substring(6, 46).trim()
+                val autor = linha.substring(46, 76).trim()
+                val duracao = linha.substring(76, 81).replace(",", ".").toDouble()
+                val anoLancamento = linha.substring(81, 85).toInt()
+                val genero = linha.substring(85, 100).trim()
+                val album = linha.substring(100, 140).trim()
+                val gravadora = linha.substring(140, 170).trim()
+                musicas.add(Musica(id, nome, autor, duracao, anoLancamento, genero, album, gravadora))
+            }
+
+            // Trailer
+            "01" -> {
+                val qtdRegistros = linha.substring(2, 7).toInt()
+                if (qtdRegistros == musicas.size) {
+                    println("Quantidade de registros corresponde ao valor informado")
+                } else {
+                    println("Quantidade de registros não corresponde ao valor informado")
+                }
+            }
+        }
+    }
+
+    // Fechar arquivo
+    leitor.close()
+    arquivo.close()
+
+    // Imprimir músicas
+    imprimirMusicas()
+}
+
