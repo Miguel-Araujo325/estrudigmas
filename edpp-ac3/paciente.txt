@@ -1,0 +1,9 @@
+00PACIENTE22-11-2024 12:39:0001
+0200011falseAna Teixeira                  Dor de cabeca       030056,00
+0200012true Mario Silva                   Febre alta          063070,50
+0200013falseCatia Miranda                 Dor na lombar       045061,40
+0200014falseFabio Reis                    Dor de garganta     025065,70
+0200015true Paula Souza                   Gestante            027057,70
+0200016true Lauro Macedo                  Pedra no rim        065068,30
+0200017falseClaudia Luz                   Sinusite            035055,50
+0100007
